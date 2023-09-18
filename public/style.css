@@ -1,0 +1,77 @@
+@font-face {
+    font-family: "Windows Regular";
+    src: url("Windows\ Regular.ttf");
+}
+
+html {
+    cursor: url("cursors/cursor.png") 32 32, auto;
+}
+
+body {
+    font-family: "Windows Regular";
+    font-size: 14px;
+    background: #3385ab;
+    background-size: cover;
+}
+
+.window {
+    padding: 0px;
+    border: 3px ridge #d5c6c6;
+    background: #d5c6c6;
+    width: fit-content;
+    text-align: left;
+    left: 50%;
+    top: 50%;
+    position: fixed;
+
+    -webkit-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+}
+.window-header {
+    background: linear-gradient(90deg, #1f46a8, #fff);
+    color: #fff;
+    padding: 5px;
+    font-weight: bold;
+}
+.window-content {
+    padding: 10px;
+}
+
+input[type=text], input[type=password], input[type=email] {
+    font-family: "Windows Regular";
+    font-size: 14px;
+    
+    width: 100%;
+    box-sizing: border-box;
+    border: 2px inset #fff;
+    padding: 5px;
+}
+button {
+    background: #e2d3d3;
+    border: 2px outset #b3a2a2;
+    padding: 5px 25px 5px 25px;
+
+    font-family: "Windows Regular";
+    font-size: 14px;
+    cursor: pointer;
+}
+button:active {
+    border-style: inset;
+}
+.image-btn {
+    background: transparent;
+    border: none;
+    margin: 1px;
+    text-align: center;
+}
+.image-btn img {
+    width: 64px;
+    height: 64px;
+}
+.image-btn:hover {
+    border: 1px dotted black;
+    margin: 0px;
+}
+.hidden {
+    visibility: hidden;
+}

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js"></script>
+</head>
+<body>
+    <div class="window">
+        <div class="window-header">
+            Sign On
+        </div>
+        <div class="window-content">
+            <img src="banner.png" style="width: 264px;">
+            <hr>
+            <form onsubmit="signOn(); return false;">
+                Username:<br>
+                <input type="text" id="username" required><br><br>
+                Password:<br>
+                <input type="password" id="password" required><br>
+                <a href="#">Forgot password?</a><br>
+                <hr>
+                <button type="submit" class="image-btn"><img src="signon.png"><br>Sign On</button>
+                <button type="button" class="image-btn"><img src="createaccount.png"><br>Create Account</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
