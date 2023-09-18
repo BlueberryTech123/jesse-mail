@@ -53,3 +53,17 @@ function signOn() {
     });
     return false;
 }
+function createAccount() {
+    const username = document.getElementById("username").value;
+    const password = document.getElementById("password").value;
+
+    $.post("/createaccount", {username: username, password: password}, (data, status) => {
+        if (data.success) {
+            window.location.href = "balls";
+        }
+        else {
+            displayError(data.message);
+        }
+    });
+    return false;
+}
