@@ -123,7 +123,7 @@ async function authenticate(username, password) {
 
 
 async function createChat(username, password, name) {
-    if (name.length < 8) {
+    if (name.length < 4) {
         return {
             message: "Must be at least 4 characters long",
             success: false
@@ -240,7 +240,7 @@ app.post("/getchats", async function(req, res) {
 });
 
 app.post("/getmessages", async function(req, res) {
-    const auth = await authenticate(username, password);
+    const auth = await authenticate(req.body.username, req.body.password);
 
     if (!auth.success) {
         return {
@@ -258,12 +258,27 @@ app.post("/getmessages", async function(req, res) {
         });
     }
     else {
-        for (int i = 0; i < data[0].length; i++) {
-            const {message, success} = await getMessage(data[0][i]);
+        console.log(data);
+        const messages = data[0].messages;
+        let returnData = []
+        if (!messages) {
+            res.json({
+                message: "cope",
+                success: true
+            });
+        }
+
+        for (let i = 0; i < messages.length; i++) {
+            const {message, success} = await getMessage(messages[i]);
             if (!success) continue
 
-            //
+            returnData.push(message);
+            console.log(message);
         }
+        res.json({
+            message: returnData,
+            success: true
+        });
     }
 })
 
