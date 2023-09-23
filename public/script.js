@@ -111,6 +111,7 @@ function validate() {
         closeWindow("login");
 
         renderSidebar();
+        renderChat();
     }
 }
 function updateUserCookies(username, password) {
@@ -189,7 +190,7 @@ function renderSidebar() {
             let newContent = "";
             for (let i = 0; i < chats.length; i++) {
                 const name = chats[i].name;
-                newContent += `<button class="sidebar-button" style="color: ${colorFromString(name)};">${name}</button><br>`;
+                newContent += `<button class="sidebar-button" style="color: ${colorFromString(name)};" onclick="activeChatId = ${chats[i].id}; renderChat(); console.log(activeChatId);">${name}</button><br>`;
             }
             if (chats.length == 0) {
                 newContent = "You aren't in any chats. Press \"Add\" to join or create one!";
@@ -212,8 +213,16 @@ function appendMessage(data, chat, back = false) {
     }
 }
 function renderChat() {
-    let chat = document.querySelector("#chat");
+    let chat = document.querySelector("#chat-content");
 
+    if (activeChatId == -1) {
+        document.getElementById("chat-content").innerHTML = "<center>Click or add a chat on the sidebar...</center>";
+        document.getElementById("message").disabled = true;
+        return;
+    }
+
+    chat.innerHTML = "";
+    document.getElementById("message").disabled = false;
     $.post("/getmessages", { username: getCookie("username"), password: getCookie("password"), id: activeChatId }, (data, status) => {
         if (data.success) {
             closeWindow("loading");
@@ -225,6 +234,7 @@ function renderChat() {
             
             for (let i = messages.length - 1; i >= 0; i--) {
                 appendMessage(messages[i], chat, true);
+                console.log(messages[i]);
             }
         }
         else {
