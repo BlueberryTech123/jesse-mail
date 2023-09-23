@@ -221,9 +221,11 @@ function renderChat() {
         return;
     }
 
-    chat.innerHTML = "";
+    displayWindow("loading");
+    chat.innerHTML = "<center>Loading messages...</center>";
     document.getElementById("message").disabled = false;
     $.post("/getmessages", { username: getCookie("username"), password: getCookie("password"), id: activeChatId }, (data, status) => {
+        chat.innerHTML = "";
         if (data.success) {
             closeWindow("loading");
             

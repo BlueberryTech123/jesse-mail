@@ -178,9 +178,9 @@ async function getMessage(id) {
         };
     }
     else {
-        data.username = (await supabase.from("users").select("name").eq("id", data.user))[0];
+        data[0].username = (await supabase.from("users").select("name").eq("id", data.user))[0];
         return {
-            message: data,
+            message: data[0],
             success: true
         };
     }
@@ -222,7 +222,7 @@ app.post("/getchats", async function(req, res) {
         let returnData = [];
         let rawChats = data[0].chats;
 
-        if (!rawChats) rawChats = [];
+        if (rawChats == null) rawChats = [];
         
         for (let i = 0; i < rawChats.length; i++) {
             const id = rawChats[i];
@@ -261,11 +261,12 @@ app.post("/getmessages", async function(req, res) {
         console.log(data);
         const messages = data[0].messages;
         let returnData = []
-        if (!messages) {
+        if (messages == null) {
             res.json({
                 message: "cope",
                 success: true
             });
+            return;
         }
 
         for (let i = 0; i < messages.length; i++) {
