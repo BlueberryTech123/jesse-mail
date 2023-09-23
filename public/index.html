@@ -10,8 +10,10 @@
     <link rel="stylesheet" href="style.css">
     <script src="script.js"></script>
 </head>
-<body>
-    <div class="window">
+<body onload="validate();">
+    <button onclick="displayError(`${document.cookie}`)">View cookies :)</button>
+    <button onclick="logOut()">Clear cookies</button>
+    <div class="window" id="login">
         <div class="window-header">
             Sign On
         </div>
@@ -26,8 +28,63 @@
                 <a href="#">Forgot password?</a><br>
                 <hr>
                 <button type="submit" class="image-btn"><img src="signon.png"><br>Sign On</button>
-                <button type="button" class="image-btn"><img src="createaccount.png"><br>Create Account</button>
+                <button type="button" class="image-btn" onclick="createAccount();"><img src="createaccount.png"><br>Create Account</button>
             </form>
+        </div>
+    </div>
+    
+    <!-- Chat window -->
+    <div class="window hidden" id="chat">
+        <div class="window-header">
+            ALIM (Albanian Online Instant Messenger)
+        </div>
+        <div class="window-content" style="width: 45vw;">
+            <div class="sidebar">
+                <button onclick="displayWindow('add')">Add</button>
+                <hr>
+                <div id="sidebar">Loading...</div>
+            </div>
+            <div class="chat">
+                
+            </div>
+            <div class="members">
+                Members<br><br>
+                <span id="members">
+                    //
+                </span>
+            </div><br>
+            <div class="message-box"><br>
+                <form onsubmit="return false;">
+                    Type message here:<br>
+                    <input type="text">
+                    <hr>
+                    <button type="submit">Send</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="window hidden" id="add" style="width: 500px;">
+        <div class="window-header">
+            Create/Join
+        </div>
+        <div class="window-content">
+            <form onsubmit="closeWindow('add'); createChat(); return false;">
+                Chat name or invite:<br><br>
+                <input type="text" id="add-input"><br><br>
+                <button type="submit">Create</button>
+                <button>Join</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="window hidden" id="loading">
+        <div class="window-header">
+            Loading...
+        </div>
+        <div class="window-content">
+            Loading...<br><br>
+            <img src="loadingbar.gif" style="border: 2px inset #b3a2a2; padding: 2px; width: 250px;">
         </div>
     </div>
 </body>

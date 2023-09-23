@@ -123,11 +123,19 @@ async function authenticate(username, password) {
 
 
 async function createChat(username, password, name) {
+    if (name.length < 8) {
+        return {
+            message: "Must be at least 4 characters long",
+            success: false
+        }
+    }
+    
     const auth = await authenticate(username, password);
 
     if (!auth.success) return auth;
 
     const uid = auth.message.id;
+    let chats = auth.message.chats
 
     const {data, error} = await supabase.from("chats").insert({
         name: name,
@@ -136,6 +144,18 @@ async function createChat(username, password, name) {
         moderators: [uid],
         owner: uid,
     }).select();
+
+    // Append chat id to chat list
+    if (chats) {
+        chats.push(data[0].id);
+    }
+    else {
+        chats = [data[0].id];
+    }
+
+    await supabase.from("users").update({
+        chats: chats
+    }).eq("id", uid);
 
     if (error) {
         return {
@@ -147,6 +167,23 @@ async function createChat(username, password, name) {
         message: data[0],
         success: true
     };
+}
+async function getMessage(id) {
+    let {data, error} = await supabase.from("messages").select().eq("id", id);
+
+    if (error) {
+        return {
+            message: "Unable to fetch message",
+            success: false
+        };
+    }
+    else {
+        data.username = (await supabase.from("users").select("name").eq("id", data.user))[0];
+        return {
+            message: data,
+            success: true
+        };
+    }
 }
 
 
@@ -167,10 +204,69 @@ app.post("/createaccount", async function(req, res) {
     res.json(message);
 });
 app.post("/createchat", async function(req, res) {
-    let message = await createChat(req.body.username, req.body.password, req.res.name);
+    let message = await createChat(req.body.username, req.body.password, req.body.name);
     console.log(`Create Chat: ${JSON.stringify(message)}`);
     res.json(message);
 });
+
+app.post("/getchats", async function(req, res) {
+    const {data, error} = await supabase.from("users").select("chats").eq("username", req.body.username).eq("password", hash(req.body.password));
+    
+    if (error) {
+        res.json({
+            message: "Unable to fetch chats",
+            success: false
+        });
+    }
+    else {
+        let returnData = [];
+        let rawChats = data[0].chats;
+
+        if (!rawChats) rawChats = [];
+        
+        for (let i = 0; i < rawChats.length; i++) {
+            const id = rawChats[i];
+            const name = (await supabase.from("chats").select("name").eq("id", id)).data[0].name;
+
+            const newItem = { id: id, name: name };
+            console.log(newItem);
+            returnData.push(newItem);
+        }
+        res.json({
+            message: returnData,
+            success: true
+        });
+    }
+});
+
+app.post("/getmessages", async function(req, res) {
+    const auth = await authenticate(username, password);
+
+    if (!auth.success) {
+        return {
+            message: "Unable to authorize",
+            success: false
+        };
+    }
+    
+    const {data, error} = await supabase.from("chats").select("messages").eq("id", req.body.id);
+
+    if (error) {
+        res.json({
+            message: "Unable to fetch messages",
+            success: false
+        });
+    }
+    else {
+        for (int i = 0; i < data[0].length; i++) {
+            const {message, success} = await getMessage(data[0][i]);
+            if (!success) continue
+
+            //
+        }
+    }
+})
+
 
 app.use(express.static("public"));
 

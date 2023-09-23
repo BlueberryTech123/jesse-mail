@@ -55,6 +55,25 @@ button {
     font-size: 14px;
     cursor: pointer;
 }
+.sidebar-button {
+    width: 100%;
+    overflow: hidden;
+    box-sizing: border-box;
+    color: #1f46a8;
+    font-weight: bold;
+    padding: 3px 10px 3px 10px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    border: none;
+    background: none;
+    text-align: left;
+}
+.sidebar-button:hover {
+    background: rgba(160, 160, 160, 0.3);
+}
+.sidebar-button:active {
+    border: none;
+}
 button:active {
     border-style: inset;
 }
@@ -74,4 +93,31 @@ button:active {
 }
 .hidden {
     visibility: hidden;
+}
+.message-username {
+    background: #1f46a8;
+    color: #fff;
+    padding: 2px 7px 2px 7px;
+}
+
+.sidebar, .chat, .members {
+    display: inline-block;
+    height: 65vh;
+    vertical-align: top;
+    box-sizing: border-box;
+    padding: 10px;
+}
+
+.sidebar {
+    width: 130px;
+    background-color: rgba(160, 160, 160, 0.3);
+    margin-left: -10px;
+}
+.chat {
+    width: calc(100% - 130px - 100px);
+}
+.members {
+    width: 100px;
+    background-color: rgba(160, 160, 160, 0.3);
+    /* margin-right: -10px; */
 }
