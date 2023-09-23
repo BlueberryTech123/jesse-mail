@@ -55,20 +55,23 @@ button {
     font-size: 14px;
     cursor: pointer;
 }
-.chat-button {
+.sidebar-button {
     width: 100%;
+    overflow: hidden;
     box-sizing: border-box;
     color: #1f46a8;
     font-weight: bold;
-    padding: 3px 20px 3px 20px;
+    padding: 3px 10px 3px 10px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
     border: none;
     background: none;
     text-align: left;
 }
-.chat-button:hover {
+.sidebar-button:hover {
     background: rgba(160, 160, 160, 0.3);
 }
-.chat-button:active {
+.sidebar-button:active {
     border: none;
 }
 button:active {
@@ -97,7 +100,7 @@ button:active {
     padding: 2px 7px 2px 7px;
 }
 
-.chats, .chat, .members {
+.sidebar, .chat, .members {
     display: inline-block;
     height: 65vh;
     vertical-align: top;
@@ -105,7 +108,7 @@ button:active {
     padding: 10px;
 }
 
-.chats {
+.sidebar {
     width: 130px;
     background-color: rgba(160, 160, 160, 0.3);
     margin-left: -10px;
