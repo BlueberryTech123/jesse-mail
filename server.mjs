@@ -178,7 +178,14 @@ async function getMessage(id) {
         };
     }
     else {
-        data[0].username = (await supabase.from("users").select("name").eq("id", data.user))[0];
+        let username = (await supabase.from("users").select("username").eq("id", data[0].user)).data[0].username;
+        console.log(username);
+        if (!username) {
+            username = "[Deleted User]";
+        }
+
+        data[0].username = username;
+
         return {
             message: data[0],
             success: true
@@ -258,13 +265,12 @@ app.post("/getmessages", async function(req, res) {
         });
     }
     else {
-        console.log(data);
         const messages = data[0].messages;
         let returnData = []
         if (messages == null) {
             res.json({
                 message: "cope",
-                success: true
+                success: false
             });
             return;
         }
@@ -274,7 +280,6 @@ app.post("/getmessages", async function(req, res) {
             if (!success) continue
 
             returnData.push(message);
-            console.log(message);
         }
         res.json({
             message: returnData,

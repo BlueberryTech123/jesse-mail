@@ -205,12 +205,29 @@ function renderSidebar() {
 }
 
 function appendMessage(data, chat, back = false) {
+    const date = new Date(data.created_at);
+    const displayedDate = `${date.getMonth()}/${date.getDay()}/${date.getYear()} - ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+    const msg = `<div class="message"><span>${displayedDate}</span>&nbsp;&nbsp;<span class="message-username" style="background: ${colorFromString(data.username)};">${data.username}</span>&nbsp;&nbsp;&nbsp;<span>${data.content}</span><hr></div>`;
     if (back) {
-        chat.innerHTML = `<div class="message"><span>${data.created_at}</span>&nbsp;&nbsp;<span class="message-username">${data.username}</span>&nbsp;&nbsp;&nbsp;<span>${data.content}</span><hr></div>${chat.innerHTML}`;
+        chat.innerHTML = `${msg}${chat.innerHTML}`;
     }
     else {
-        chat.innerHTML = `${chat.innerHTML}<div class="message"><span>${data.created_at}</span>&nbsp;&nbsp;<span class="message-username">${data.username}</span>&nbsp;&nbsp;&nbsp;<span>${data.content}</span><hr></div>`;
+        chat.innerHTML = `${chat.innerHTML}${msg}`;
     }
+}
+function sendMessage() {
+    const username = getCookie("username");
+    const password = getCookie("password");
+    const content = document.getElementById("message").value;
+
+    $.post("/sendmessage", { username: getCookie("username"), password: getCookie("password"), id: activeChatId, content: content }, (data, status) => {
+        if (data.success) {
+            //
+        }
+        else {
+            displayError(data.message);
+        }
+    });
 }
 function renderChat() {
     let chat = document.querySelector("#chat-content");
@@ -230,6 +247,7 @@ function renderChat() {
             closeWindow("loading");
             
             let messages = data.message;
+            console.log(messages);
             if (!messages) {
                 return;
             }

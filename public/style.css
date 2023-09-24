@@ -10,7 +10,7 @@ html {
 body {
     font-family: "Windows Regular";
     font-size: 14px;
-    background: #3385ab;
+    background: #3a6ea5;
     background-size: cover;
 }
 
@@ -28,7 +28,7 @@ body {
     transform: translate(-50%, -50%);
 }
 .window-header {
-    background: linear-gradient(90deg, #1f46a8, #fff);
+    background: linear-gradient(90deg, #0a246a, #a7caf0);
     color: #fff;
     padding: 5px;
     font-weight: bold;
