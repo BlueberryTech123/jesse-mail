@@ -106,6 +106,7 @@ button:active {
     vertical-align: top;
     box-sizing: border-box;
     padding: 10px;
+    overflow-y: auto;
 }
 
 .sidebar {

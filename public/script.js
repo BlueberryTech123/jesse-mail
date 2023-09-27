@@ -142,6 +142,7 @@ function logOut() {
     document.cookie = "username=;expires=Thu, 01 Jan 1970 00:00:01 GMT";
     document.cookie = "password=;expires=Thu, 01 Jan 1970 00:00:01 GMT";
     activeChatId = -1;
+    document.getElementById("sidebar").innerHTML = "Loading...";
     validate();
 }
 function createAccount() {
