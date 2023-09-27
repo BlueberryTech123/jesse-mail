@@ -33,6 +33,15 @@ function generateInvite() {
     return hash;
 }
 
+function returnAppend(old, data) {
+    if (old) {
+        let teagueIsUgly = [...old];
+        teagueIsUgly.push(data);
+        return teagueIsUgly;
+    }
+
+    return [data];
+}
 function hash(data) {
     return crypto.createHash('md5').update("i_hate_diggers_5967_" + data).digest("hex");
 }
@@ -90,7 +99,7 @@ async function createAccount(username, password) {
 
     if (error) {
         return {
-            message: error,
+            message: error.message,
             success: false
         };
     }
@@ -104,7 +113,7 @@ async function authenticate(username, password) {
 
     if (error) {
         return {
-            message: error,
+            message: error.message,
             success: false
         };
     }
@@ -135,7 +144,7 @@ async function createChat(username, password, name) {
     if (!auth.success) return auth;
 
     const uid = auth.message.id;
-    let chats = auth.message.chats
+    let chats = auth.message.chats;
 
     const {data, error} = await supabase.from("chats").insert({
         name: name,
@@ -159,7 +168,7 @@ async function createChat(username, password, name) {
 
     if (error) {
         return {
-            message: error,
+            message: error.message,
             success: false
         };
     }
@@ -192,6 +201,38 @@ async function getMessage(id) {
         };
     }
 }
+async function sendMessage(username, password, message, chat) {
+    const auth = await authenticate(username, password);
+
+    if (!auth.success) return auth;
+
+    const uid = auth.message.id;
+
+    let {data, error} = await supabase.from("messages").insert({
+        user: uid,
+        content: message
+    }).select();
+
+    const messageData = data[0];
+    const mid = messageData.id;
+
+    if (error) {
+        return {
+            message: error.message,
+            success: false
+        };
+    }
+    console.log(await supabase.from("chats").select("id").eq("id", chat));
+    ({data, error} = await supabase.from("chats").update({
+        messages: returnAppend(
+            (await supabase.from("chats").select("messages").eq("id", chat)).data[0].messages, 
+            mid)
+    }).eq("id", chat));
+    return {
+        message: messageData,
+        success: true
+    };
+}
 
 
 // Routing
@@ -213,6 +254,11 @@ app.post("/createaccount", async function(req, res) {
 app.post("/createchat", async function(req, res) {
     let message = await createChat(req.body.username, req.body.password, req.body.name);
     console.log(`Create Chat: ${JSON.stringify(message)}`);
+    res.json(message);
+});
+app.post("/sendmessage", async function(req, res) {
+    let message = await sendMessage(req.body.username, req.body.password, req.body.content, req.body.id);
+    console.log(`Send message: ${JSON.stringify(message)}`);
     res.json(message);
 });
 

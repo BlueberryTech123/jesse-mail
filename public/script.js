@@ -141,6 +141,7 @@ function signOn() {
 function logOut() {
     document.cookie = "username=;expires=Thu, 01 Jan 1970 00:00:01 GMT";
     document.cookie = "password=;expires=Thu, 01 Jan 1970 00:00:01 GMT";
+    activeChatId = -1;
     validate();
 }
 function createAccount() {
@@ -216,13 +217,12 @@ function appendMessage(data, chat, back = false) {
     }
 }
 function sendMessage() {
-    const username = getCookie("username");
-    const password = getCookie("password");
     const content = document.getElementById("message").value;
 
     $.post("/sendmessage", { username: getCookie("username"), password: getCookie("password"), id: activeChatId, content: content }, (data, status) => {
         if (data.success) {
-            //
+            // temporary, pelase remove ;-;
+            renderChat();
         }
         else {
             displayError(data.message);
