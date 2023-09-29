@@ -18,6 +18,8 @@ let errorWindow = `
     </div>
 </div>`
 
+const parser = new DOMParser();
+
 const clickSound = new Audio("audio/click.wav");
 const keySound = new Audio("audio/key.wav");
 const errorSound = new Audio("audio/error.mp3");
@@ -71,6 +73,11 @@ function storeUser(username, password) {
     clearCookies();
     setCookie("username", username);
     setCookie("password", password);
+}
+
+function bottomOfChat() {
+    const chat = document.getElementById("chat-content");
+    chat.scrollTop = chat.scrollHeight;
 }
 
 function displayError(error) {
@@ -209,7 +216,9 @@ function renderSidebar() {
 function appendMessage(data, chat, back = false) {
     const date = new Date(data.created_at);
     const displayedDate = `${date.getMonth()}/${date.getDay()}/${date.getYear()} - ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
-    const msg = `<div class="message"><span>${displayedDate}</span>&nbsp;&nbsp;<span class="message-username" style="background: ${colorFromString(data.username)};">${data.username}</span>&nbsp;&nbsp;&nbsp;<span>${data.content}</span><hr></div>`;
+    const filteredContent = data.content.replaceAll('<', '&lt;');
+    
+    const msg = `<div class="message"><span>${displayedDate}</span>&nbsp;&nbsp;<span class="message-username" style="background: ${colorFromString(data.username)};">${data.username}</span>&nbsp;&nbsp;&nbsp;<span>${filteredContent}</span><hr></div>`;
     if (back) {
         chat.innerHTML = `${msg}${chat.innerHTML}`;
     }
@@ -219,18 +228,22 @@ function appendMessage(data, chat, back = false) {
 }
 function sendMessage() {
     const content = document.getElementById("message").value;
+    document.getElementById("message").value = null;
+
+    document.getElementById("chat-content").innerHTML += "Sending...<br>";
+    bottomOfChat();
 
     $.post("/sendmessage", { username: getCookie("username"), password: getCookie("password"), id: activeChatId, content: content }, (data, status) => {
         if (data.success) {
             // temporary, pelase remove ;-;
-            renderChat();
+            renderChat(true);
         }
         else {
             displayError(data.message);
         }
     });
 }
-function renderChat() {
+function renderChat(seamless = false) {
     let chat = document.querySelector("#chat-content");
 
     if (activeChatId == -1) {
@@ -239,8 +252,10 @@ function renderChat() {
         return;
     }
 
-    displayWindow("loading");
-    chat.innerHTML = "<center>Loading messages...</center>";
+    if (!seamless) {
+        displayWindow("loading");
+        chat.innerHTML = "<center>Loading messages...</center>";
+    }
     document.getElementById("message").disabled = false;
     $.post("/getmessages", { username: getCookie("username"), password: getCookie("password"), id: activeChatId }, (data, status) => {
         chat.innerHTML = "";
@@ -257,6 +272,8 @@ function renderChat() {
                 appendMessage(messages[i], chat, true);
                 console.log(messages[i]);
             }
+
+            bottomOfChat();
         }
         else {
             displayError(data.message);

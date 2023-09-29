@@ -95,7 +95,7 @@ async function createAccount(username, password) {
     const {data, error} = await supabase.from("users").insert({
         username: username,
         password: hash(password),
-    }).select();
+    }).select().maybeSingle();
 
     if (error) {
         return {
@@ -104,12 +104,12 @@ async function createAccount(username, password) {
         };
     }
     return {
-        message: data[0],
+        message: data,
         success: true
     };
 }
 async function authenticate(username, password) {
-    const {data, error} = await supabase.from("users").select().eq("username", username).eq("password", hash(password));
+    const {data, error} = await supabase.from("users").select().eq("username", username).eq("password", hash(password)).maybeSingle();
 
     if (error) {
         return {
@@ -125,7 +125,7 @@ async function authenticate(username, password) {
     }
 
     return {
-        message: data[0],
+        message: data,
         success: true
     };
 }
@@ -152,14 +152,14 @@ async function createChat(username, password, name) {
         members: [uid],
         moderators: [uid],
         owner: uid,
-    }).select();
+    }).select().maybeSingle();
 
     // Append chat id to chat list
     if (chats) {
-        chats.push(data[0].id);
+        chats.push(data.id);
     }
     else {
-        chats = [data[0].id];
+        chats = [data.id];
     }
 
     await supabase.from("users").update({
@@ -173,13 +173,13 @@ async function createChat(username, password, name) {
         };
     }
     return {
-        message: data[0],
+        message: data,
         success: true
     };
 }
 async function getMessage(id) {
-    let {data, error} = await supabase.from("messages").select().eq("id", id);
-
+    let start = Date.now();
+    let {data, error} = await supabase.from("messages").select().eq("id", id).maybeSingle();
     if (error) {
         return {
             message: "Unable to fetch message",
@@ -187,16 +187,16 @@ async function getMessage(id) {
         };
     }
     else {
-        let username = (await supabase.from("users").select("username").eq("id", data[0].user)).data[0].username;
-        console.log(username);
+        console.log(`====================================\nTOTAL TIME TO LOAD MESSAGE: ${Date.now() - start} ms`);
+        let username = data.username;
         if (!username) {
-            username = "[Deleted User]";
+            data.username = "[Deleted User]";
         }
 
-        data[0].username = username;
+        console.log(`TOTAL TIME TO LOAD: ${Date.now() - start} ms`);
 
         return {
-            message: data[0],
+            message: data,
             success: true
         };
     }
@@ -210,10 +210,11 @@ async function sendMessage(username, password, message, chat) {
 
     let {data, error} = await supabase.from("messages").insert({
         user: uid,
-        content: message
-    }).select();
+        content: message,
+        username: username
+    }).select().maybeSingle();
 
-    const messageData = data[0];
+    const messageData = data;
     const mid = messageData.id;
 
     if (error) {
@@ -225,7 +226,7 @@ async function sendMessage(username, password, message, chat) {
     console.log(await supabase.from("chats").select("id").eq("id", chat));
     ({data, error} = await supabase.from("chats").update({
         messages: returnAppend(
-            (await supabase.from("chats").select("messages").eq("id", chat)).data[0].messages, 
+            (await supabase.from("chats").select("messages").eq("id", chat).maybeSingle()).data.messages, 
             mid)
     }).eq("id", chat));
     return {
@@ -263,7 +264,7 @@ app.post("/sendmessage", async function(req, res) {
 });
 
 app.post("/getchats", async function(req, res) {
-    const {data, error} = await supabase.from("users").select("chats").eq("username", req.body.username).eq("password", hash(req.body.password));
+    const {data, error} = await supabase.from("users").select("chats").eq("username", req.body.username).eq("password", hash(req.body.password)).maybeSingle();
     
     if (error) {
         res.json({
@@ -273,7 +274,7 @@ app.post("/getchats", async function(req, res) {
     }
     else {
         let returnData = [];
-        let rawChats = data[0].chats;
+        let rawChats = data.chats;
 
         if (rawChats == null) rawChats = [];
         
@@ -282,7 +283,6 @@ app.post("/getchats", async function(req, res) {
             const name = (await supabase.from("chats").select("name").eq("id", id)).data[0].name;
 
             const newItem = { id: id, name: name };
-            console.log(newItem);
             returnData.push(newItem);
         }
         res.json({
@@ -302,7 +302,7 @@ app.post("/getmessages", async function(req, res) {
         };
     }
     
-    const {data, error} = await supabase.from("chats").select("messages").eq("id", req.body.id);
+    const {data, error} = await supabase.from("chats").select("messages").eq("id", req.body.id).maybeSingle();
 
     if (error) {
         res.json({
@@ -311,7 +311,7 @@ app.post("/getmessages", async function(req, res) {
         });
     }
     else {
-        const messages = data[0].messages;
+        const messages = data.messages;
         let returnData = []
         if (messages == null) {
             res.json({
